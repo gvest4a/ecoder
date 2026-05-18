@@ -9,13 +9,9 @@ namespace XorCipherApp.UI
     /// </summary>
     public class ShadowPanel : Panel
     {
-        private readonly ColorPalette _palette;
-
-        public ShadowPanel(ColorPalette palette)
+        public ShadowPanel()
         {
-            _palette = palette;
-            
-            BackColor = _palette.SurfaceWhite;
+            BackColor = ColorPalette.SurfaceWhite;
             
             // Enable double buffering to reduce flicker
             SetStyle(ControlStyles.OptimizedDoubleBuffer | 
@@ -29,7 +25,7 @@ namespace XorCipherApp.UI
             
             // Draw subtle border
             ControlPaint.DrawBorder(e.Graphics, ClientRectangle, 
-                _palette.BorderLight, ButtonBorderStyle.Solid);
+                ColorPalette.BorderLight, ButtonBorderStyle.Solid);
             
             // Optional: Add subtle shadow effect
             using (var shadowBrush = new SolidBrush(Color.FromArgb(20, 0, 0, 0)))
