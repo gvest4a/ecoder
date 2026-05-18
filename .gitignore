@@ -1,34 +1,23 @@
 ```
-# Compressed files
-*.tar.gz
-
-# Environment
-.env
-.env.local
-*.env.*
-
-# Logs and temp files
-*.log
+# Build artifacts
+*.obj
+*.exe
+*.dll
+*.pdb
+*.userprefs
+*.cache
 *.tmp
-*.swp
-
-# Editors
-.vscode/
-.idea/
 
 # Dependencies
-node_modules/
-.venv/
-venv/
-__pycache__/
-.mypy_cache/
-.pytest_cache/
-dist/
-build/
-target/
-.gradle/
+packages/
+bin/
+obj/
 
-# OS specific
-.DS_Store
-Thumbs.db
+# Logs
+*.log
+
+# User-specific files
+.vs/
+*.user
+*.suo
 ```

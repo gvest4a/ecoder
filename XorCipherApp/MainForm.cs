@@ -1,5 +1,6 @@
 using System;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.IO;
 using System.Text;
 using System.Windows.Forms;
@@ -20,6 +21,8 @@ namespace XorCipherApp
         private Button btnLoadEncryptFile = null!;
         private Button btnSaveEncryptResult = null!;
         private Button btnClearEncrypt = null!;
+        private Panel leftPanelEncrypt = null!;
+        private Panel rightPanelEncrypt = null!;
 
         // Decrypt controls
         private TextBox txtDecryptInput = null!;
@@ -29,6 +32,19 @@ namespace XorCipherApp
         private Button btnLoadDecryptFile = null!;
         private Button btnSaveDecryptResult = null!;
         private Button btnClearDecrypt = null!;
+        private Panel leftPanelDecrypt = null!;
+        private Panel rightPanelDecrypt = null!;
+
+        // Color palette - Muted Purple
+        private readonly Color bgColor = Color.FromArgb(245, 242, 250);
+        private readonly Color panelColor = Color.FromArgb(255, 255, 255);
+        private readonly Color primaryColor = Color.FromArgb(108, 92, 153);
+        private readonly Color primaryDark = Color.FromArgb(88, 72, 123);
+        private readonly Color accentColor = Color.FromArgb(149, 117, 205);
+        private readonly Color textColor = Color.FromArgb(62, 52, 81);
+        private readonly Color successColor = Color.FromArgb(76, 175, 80);
+        private readonly Color dangerColor = Color.FromArgb(229, 115, 115);
+        private readonly Color infoColor = Color.FromArgb(66, 165, 245);
 
         public MainForm()
         {
@@ -39,21 +55,27 @@ namespace XorCipherApp
         {
             this.SuspendLayout();
             
-            // Main form settings - Modern design
+            // Main form settings - Modern design with rounded corners simulation
             this.AutoScaleDimensions = new SizeF(7F, 15F);
             this.AutoScaleMode = AutoScaleMode.Font;
-            this.ClientSize = new Size(900, 650);
+            this.ClientSize = new Size(1100, 700);
             this.Text = "XOR Шифрование текста";
             this.FormBorderStyle = FormBorderStyle.FixedSingle;
             this.MaximizeBox = false;
             this.StartPosition = FormStartPosition.CenterScreen;
-            this.BackColor = Color.FromArgb(245, 247, 250);
+            this.BackColor = bgColor;
+            this.Padding = new Padding(20);
 
-            // TabControl
+            // TabControl with custom styling
             tabControl = new TabControl();
-            tabControl.Location = new Point(20, 20);
-            tabControl.Size = new Size(860, 580);
+            tabControl.Dock = DockStyle.Fill;
             tabControl.Font = new Font("Segoe UI", 10F);
+            tabControl.ItemSize = new Size(120, 35);
+            tabControl.SizeMode = TabSizeMode.Fixed;
+            
+            // Custom draw for tabs
+            tabControl.DrawMode = TabDrawMode.OwnerDrawFixed;
+            tabControl.DrawItem += TabControl_DrawItem;
             
             // Create tabs
             tabEncrypt = new TabPage("Шифрование");
@@ -73,133 +95,182 @@ namespace XorCipherApp
             this.ResumeLayout(false);
         }
 
+        private void TabControl_DrawItem(object? sender, DrawItemEventArgs e)
+        {
+            TabControl tabControl = (TabControl)sender!;
+            TabPage page = tabControl.TabPages[e.Index];
+            
+            Rectangle tabBounds = e.Bounds;
+            bool isSelected = (e.State & DrawItemState.Selected) == DrawItemState.Selected;
+            
+            // Background
+            using Brush brush = new SolidBrush(isSelected ? primaryColor : Color.FromArgb(230, 225, 235));
+            e.Graphics.FillRectangle(brush, tabBounds);
+            
+            // Text
+            StringFormat stringFormat = new StringFormat
+            {
+                Alignment = StringAlignment.Center,
+                LineAlignment = StringAlignment.Center
+            };
+            
+            using Brush textBrush = new SolidBrush(isSelected ? Color.White : textColor);
+            e.Graphics.DrawString(page.Text, new Font("Segoe UI Semibold", 10F), textBrush, tabBounds, stringFormat);
+            
+            // Rounded top corners for selected tab
+            if (isSelected)
+            {
+                using Pen pen = new Pen(primaryColor, 2);
+                e.Graphics.DrawLine(pen, tabBounds.Left, tabBounds.Bottom - 1, tabBounds.Right, tabBounds.Bottom - 1);
+            }
+        }
+
         private void SetupEncryptTab()
         {
-            tabEncrypt.BackColor = Color.FromArgb(245, 247, 250);
+            tabEncrypt.BackColor = bgColor;
             tabEncrypt.AutoScroll = true;
+            tabEncrypt.Padding = new Padding(0);
 
-            // Label for input text
-            Label lblInput = CreateStyledLabel("Исходный текст:", 20, 20);
-            tabEncrypt.Controls.Add(lblInput);
+            // Left Panel - Input and Controls
+            leftPanelEncrypt = CreateModernPanel(20, 20, 500, 600);
+            tabEncrypt.Controls.Add(leftPanelEncrypt);
 
-            // TextBox for input text
-            txtEncryptInput = CreateStyledTextBox(20, 50, 780, 120, false);
-            tabEncrypt.Controls.Add(txtEncryptInput);
+            // Right Panel - Output
+            rightPanelEncrypt = CreateModernPanel(540, 20, 500, 600);
+            tabEncrypt.Controls.Add(rightPanelEncrypt);
 
-            // Label for key
-            Label lblKey = CreateStyledLabel("Ключ шифрования:", 20, 185);
-            tabEncrypt.Controls.Add(lblKey);
-
-            // TextBox for key
-            txtEncryptKey = CreateStyledTextBox(20, 215, 350, 30, false);
-            txtEncryptKey.Text = "SecretKey123";
-            tabEncrypt.Controls.Add(txtEncryptKey);
-
-            // Button panel
-            int buttonY = 260;
-            int buttonSpacing = 140;
+            // === LEFT PANEL CONTENT ===
+            int yOffset = 25;
             
-            btnLoadEncryptFile = CreateStyledButton("📁 Загрузить из файла", 20, buttonY, 180, 40);
+            Label lblInput = CreateStyledLabel("Исходный текст:", 20, yOffset, 12F);
+            leftPanelEncrypt.Controls.Add(lblInput);
+            yOffset += 35;
+
+            txtEncryptInput = CreateModernTextBox(20, yOffset, 460, 140, false);
+            leftPanelEncrypt.Controls.Add(txtEncryptInput);
+            yOffset += 160;
+
+            Label lblKey = CreateStyledLabel("Ключ шифрования:", 20, yOffset, 11F);
+            leftPanelEncrypt.Controls.Add(lblKey);
+            yOffset += 30;
+
+            txtEncryptKey = CreateModernTextBox(20, yOffset, 460, 40, false);
+            txtEncryptKey.Text = "SecretKey123";
+            leftPanelEncrypt.Controls.Add(txtEncryptKey);
+            yOffset += 60;
+
+            // Buttons in left panel
+            btnLoadEncryptFile = CreateModernButton("📁 Загрузить из файла", 20, yOffset, 200, 42, infoColor);
             btnLoadEncryptFile.Click += BtnLoadEncryptFile_Click;
-            tabEncrypt.Controls.Add(btnLoadEncryptFile);
+            leftPanelEncrypt.Controls.Add(btnLoadEncryptFile);
 
-            btnEncrypt = CreateStyledButton("🔒 Зашифровать", 210, buttonY, 160, 40);
-            btnEncrypt.BackColor = Color.FromArgb(76, 175, 80);
-            btnEncrypt.ForeColor = Color.White;
+            btnEncrypt = CreateModernButton("🔒 Зашифровать", 240, yOffset, 200, 42, successColor);
             btnEncrypt.Click += BtnEncrypt_Click;
-            tabEncrypt.Controls.Add(btnEncrypt);
+            leftPanelEncrypt.Controls.Add(btnEncrypt);
+            yOffset += 55;
 
-            btnClearEncrypt = CreateStyledButton("🗑️ Очистить", 380, buttonY, 140, 40);
-            btnClearEncrypt.BackColor = Color.FromArgb(244, 67, 54);
-            btnClearEncrypt.ForeColor = Color.White;
+            btnClearEncrypt = CreateModernButton("🗑️ Очистить всё", 20, yOffset, 200, 42, dangerColor);
             btnClearEncrypt.Click += BtnClearEncrypt_Click;
-            tabEncrypt.Controls.Add(btnClearEncrypt);
+            leftPanelEncrypt.Controls.Add(btnClearEncrypt);
 
-            // Label for result
-            Label lblResult = CreateStyledLabel("Результат (HEX):", 20, 320);
-            tabEncrypt.Controls.Add(lblResult);
+            // === RIGHT PANEL CONTENT ===
+            Label lblResult = CreateStyledLabel("Результат (HEX):", 20, 25, 12F);
+            rightPanelEncrypt.Controls.Add(lblResult);
 
-            // TextBox for result
-            txtEncryptResult = CreateStyledTextBox(20, 350, 780, 150, true);
-            tabEncrypt.Controls.Add(txtEncryptResult);
+            txtEncryptResult = CreateModernTextBox(20, 60, 460, 420, true);
+            rightPanelEncrypt.Controls.Add(txtEncryptResult);
 
-            // Save button
-            btnSaveEncryptResult = CreateStyledButton("💾 Сохранить результат", 20, 520, 200, 40);
-            btnSaveEncryptResult.BackColor = Color.FromArgb(33, 150, 243);
-            btnSaveEncryptResult.ForeColor = Color.White;
+            btnSaveEncryptResult = CreateModernButton("💾 Сохранить результат", 20, 500, 460, 45, primaryColor);
             btnSaveEncryptResult.Click += BtnSaveEncryptResult_Click;
-            tabEncrypt.Controls.Add(btnSaveEncryptResult);
+            rightPanelEncrypt.Controls.Add(btnSaveEncryptResult);
         }
 
         private void SetupDecryptTab()
         {
-            tabDecrypt.BackColor = Color.FromArgb(245, 247, 250);
+            tabDecrypt.BackColor = bgColor;
             tabDecrypt.AutoScroll = true;
+            tabDecrypt.Padding = new Padding(0);
 
-            // Label for input text
-            Label lblInput = CreateStyledLabel("Зашифрованный текст (HEX):", 20, 20);
-            tabDecrypt.Controls.Add(lblInput);
+            // Left Panel - Input and Controls
+            leftPanelDecrypt = CreateModernPanel(20, 20, 500, 600);
+            tabDecrypt.Controls.Add(leftPanelDecrypt);
 
-            // TextBox for input text
-            txtDecryptInput = CreateStyledTextBox(20, 50, 780, 120, false);
-            tabDecrypt.Controls.Add(txtDecryptInput);
+            // Right Panel - Output
+            rightPanelDecrypt = CreateModernPanel(540, 20, 500, 600);
+            tabDecrypt.Controls.Add(rightPanelDecrypt);
 
-            // Label for key
-            Label lblKey = CreateStyledLabel("Ключ расшифрования:", 20, 185);
-            tabDecrypt.Controls.Add(lblKey);
-
-            // TextBox for key
-            txtDecryptKey = CreateStyledTextBox(20, 215, 350, 30, false);
-            txtDecryptKey.Text = "SecretKey123";
-            tabDecrypt.Controls.Add(txtDecryptKey);
-
-            // Button panel
-            int buttonY = 260;
+            // === LEFT PANEL CONTENT ===
+            int yOffset = 25;
             
-            btnLoadDecryptFile = CreateStyledButton("📁 Загрузить HEX файл", 20, buttonY, 180, 40);
+            Label lblInput = CreateStyledLabel("Зашифрованный текст (HEX):", 20, yOffset, 12F);
+            leftPanelDecrypt.Controls.Add(lblInput);
+            yOffset += 35;
+
+            txtDecryptInput = CreateModernTextBox(20, yOffset, 460, 140, false);
+            leftPanelDecrypt.Controls.Add(txtDecryptInput);
+            yOffset += 160;
+
+            Label lblKey = CreateStyledLabel("Ключ расшифрования:", 20, yOffset, 11F);
+            leftPanelDecrypt.Controls.Add(lblKey);
+            yOffset += 30;
+
+            txtDecryptKey = CreateModernTextBox(20, yOffset, 460, 40, false);
+            txtDecryptKey.Text = "SecretKey123";
+            leftPanelDecrypt.Controls.Add(txtDecryptKey);
+            yOffset += 60;
+
+            // Buttons in left panel
+            btnLoadDecryptFile = CreateModernButton("📁 Загрузить HEX файл", 20, yOffset, 200, 42, infoColor);
             btnLoadDecryptFile.Click += BtnLoadDecryptFile_Click;
-            tabDecrypt.Controls.Add(btnLoadDecryptFile);
+            leftPanelDecrypt.Controls.Add(btnLoadDecryptFile);
 
-            btnDecrypt = CreateStyledButton("🔓 Расшифровать", 210, buttonY, 160, 40);
-            btnDecrypt.BackColor = Color.FromArgb(76, 175, 80);
-            btnDecrypt.ForeColor = Color.White;
+            btnDecrypt = CreateModernButton("🔓 Расшифровать", 240, yOffset, 200, 42, successColor);
             btnDecrypt.Click += BtnDecrypt_Click;
-            tabDecrypt.Controls.Add(btnDecrypt);
+            leftPanelDecrypt.Controls.Add(btnDecrypt);
+            yOffset += 55;
 
-            btnClearDecrypt = CreateStyledButton("🗑️ Очистить", 380, buttonY, 140, 40);
-            btnClearDecrypt.BackColor = Color.FromArgb(244, 67, 54);
-            btnClearDecrypt.ForeColor = Color.White;
+            btnClearDecrypt = CreateModernButton("🗑️ Очистить всё", 20, yOffset, 200, 42, dangerColor);
             btnClearDecrypt.Click += BtnClearDecrypt_Click;
-            tabDecrypt.Controls.Add(btnClearDecrypt);
+            leftPanelDecrypt.Controls.Add(btnClearDecrypt);
 
-            // Label for result
-            Label lblResult = CreateStyledLabel("Результат:", 20, 320);
-            tabDecrypt.Controls.Add(lblResult);
+            // === RIGHT PANEL CONTENT ===
+            Label lblResult = CreateStyledLabel("Результат:", 20, 25, 12F);
+            rightPanelDecrypt.Controls.Add(lblResult);
 
-            // TextBox for result
-            txtDecryptResult = CreateStyledTextBox(20, 350, 780, 150, true);
-            tabDecrypt.Controls.Add(txtDecryptResult);
+            txtDecryptResult = CreateModernTextBox(20, 60, 460, 420, true);
+            rightPanelDecrypt.Controls.Add(txtDecryptResult);
 
-            // Save button
-            btnSaveDecryptResult = CreateStyledButton("💾 Сохранить результат", 20, 520, 200, 40);
-            btnSaveDecryptResult.BackColor = Color.FromArgb(33, 150, 243);
-            btnSaveDecryptResult.ForeColor = Color.White;
+            btnSaveDecryptResult = CreateModernButton("💾 Сохранить результат", 20, 500, 460, 45, primaryColor);
             btnSaveDecryptResult.Click += BtnSaveDecryptResult_Click;
-            tabDecrypt.Controls.Add(btnSaveDecryptResult);
+            rightPanelDecrypt.Controls.Add(btnSaveDecryptResult);
         }
 
-        private Label CreateStyledLabel(string text, int x, int y)
+        private Panel CreateModernPanel(int x, int y, int width, int height)
+        {
+            Panel panel = new Panel();
+            panel.Location = new Point(x, y);
+            panel.Size = new Size(width, height);
+            panel.BackColor = panelColor;
+            panel.BorderStyle = BorderStyle.None;
+            
+            // Shadow effect simulation using Padding and BackColor
+            panel.Padding = new Padding(15);
+            
+            return panel;
+        }
+
+        private Label CreateStyledLabel(string text, int x, int y, float fontSize = 11F)
         {
             Label label = new Label();
             label.Text = text;
             label.Location = new Point(x, y);
             label.AutoSize = true;
-            label.Font = new Font("Segoe UI", 11F, FontStyle.Bold);
-            label.ForeColor = Color.FromArgb(55, 65, 81);
+            label.Font = new Font("Segoe UI Semibold", fontSize, FontStyle.Regular);
+            label.ForeColor = textColor;
             return label;
         }
 
-        private TextBox CreateStyledTextBox(int x, int y, int width, int height, bool readOnly)
+        private TextBox CreateModernTextBox(int x, int y, int width, int height, bool readOnly)
         {
             TextBox textBox = new TextBox();
             textBox.Location = new Point(x, y);
@@ -208,21 +279,41 @@ namespace XorCipherApp
             textBox.ScrollBars = ScrollBars.Vertical;
             textBox.ReadOnly = readOnly;
             textBox.Font = new Font("Consolas", 10F);
-            textBox.BorderStyle = BorderStyle.FixedSingle;
-            textBox.BackColor = Color.White;
+            textBox.BorderStyle = BorderStyle.None;
+            textBox.BackColor = Color.FromArgb(250, 248, 252);
+            textBox.Padding = new Padding(10);
+            
+            // Add a subtle border
+            textBox.GotFocus += (s, e) => {
+                var tb = (TextBox)s!;
+                tb.BackColor = Color.White;
+            };
+            textBox.LostFocus += (s, e) => {
+                var tb = (TextBox)s!;
+                tb.BackColor = Color.FromArgb(250, 248, 252);
+            };
+            
             return textBox;
         }
 
-        private Button CreateStyledButton(string text, int x, int y, int width, int height)
+        private Button CreateModernButton(string text, int x, int y, int width, int height, Color baseColor)
         {
             Button button = new Button();
             button.Text = text;
             button.Location = new Point(x, y);
             button.Size = new Size(width, height);
-            button.Font = new Font("Segoe UI", 10F, FontStyle.Regular);
+            button.Font = new Font("Segoe UI Semibold", 10.5F, FontStyle.Regular);
             button.FlatStyle = FlatStyle.Flat;
             button.FlatAppearance.BorderSize = 0;
             button.Cursor = Cursors.Hand;
+            button.BackColor = baseColor;
+            button.ForeColor = Color.White;
+            button.FlatAppearance.MouseOverBackColor = ControlPaint.Light(baseColor, 0.1f);
+            button.FlatAppearance.MouseDownBackColor = ControlPaint.Dark(baseColor, 0.1f);
+            
+            // Round corners simulation (requires custom drawing or using Region, keeping it simple for now)
+            button.FlatAppearance.BorderColor = baseColor;
+            
             return button;
         }
 
