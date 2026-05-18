@@ -8,22 +8,4 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
-  <ItemGroup>
-    <!-- Core Layer - Business Logic -->
-    <Compile Include="Core\**\*.cs" />
-    
-    <!-- Models Layer - Data Structures -->
-    <Compile Include="Models\**\*.cs" />
-    
-    <!-- Services Layer - External Operations -->
-    <Compile Include="Services\**\*.cs" />
-    
-    <!-- UI Layer - User Interface -->
-    <Compile Include="UI\**\*.cs" />
-    
-    <!-- Main Application Files -->
-    <Compile Include="Program.cs" />
-    <Compile Include="MainForm.cs" />
-  </ItemGroup>
-
 </Project>
