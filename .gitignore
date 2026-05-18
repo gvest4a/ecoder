@@ -1,6 +1,7 @@
 ```
 # Build artifacts
-*.obj
+bin/
+obj/
 *.exe
 *.dll
 *.pdb
@@ -8,20 +9,27 @@
 
 # Dependencies
 packages/
-bin/
-obj/
+node_modules/
+.nuget/
 
-# Logs
+# Logs and temp files
 *.log
+*.tmp
+*.temp
 
 # User-specific files
+.vs/
 *.user
 *.suo
-.vs/
-.vscode/
+*.userosscache
+*.sln.docstates
 
-# Temporary files
-*.tmp
-*~
+# Environment specific
+.env
+.env.local
+*.env.*
+
+# OS generated files
+.DS_Store
 Thumbs.db
 ```

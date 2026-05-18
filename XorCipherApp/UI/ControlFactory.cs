@@ -8,14 +8,12 @@ namespace XorCipherApp.UI
     /// </summary>
     public static class ControlFactory
     {
-        private static readonly ColorPalette _palette = new ColorPalette();
-
         /// <summary>
         /// Creates a modern panel with subtle border
         /// </summary>
         public static Panel CreateModernPanel(int x, int y, int width, int height)
         {
-            Panel panel = new ShadowPanel(_palette);
+            Panel panel = new ShadowPanel();
             panel.Location = new Point(x, y);
             panel.Size = new Size(width, height);
             panel.Dock = DockStyle.None;
@@ -34,7 +32,7 @@ namespace XorCipherApp.UI
             label.Location = new Point(x, y);
             label.AutoSize = true;
             label.Font = new Font("Segoe UI", fontSize, bold ? FontStyle.Bold : FontStyle.Regular);
-            label.ForeColor = _palette.TextPrimary;
+            label.ForeColor = ColorPalette.TextPrimary;
             return label;
         }
 
@@ -43,7 +41,7 @@ namespace XorCipherApp.UI
         /// </summary>
         public static ModernTextBox CreateModernTextBox(int x, int y, int width, int height, bool readOnly)
         {
-            var textBox = new ModernTextBox(_palette)
+            var textBox = new ModernTextBox()
             {
                 Location = new Point(x, y),
                 Size = new Size(width, height),
@@ -62,7 +60,7 @@ namespace XorCipherApp.UI
         /// </summary>
         public static ModernButton CreateModernButton(string text, int x, int y, int width, int height)
         {
-            var button = new ModernButton(_palette, text)
+            var button = new ModernButton(text, ColorPalette.PrimaryDark)
             {
                 Location = new Point(x, y),
                 Size = new Size(width, height),

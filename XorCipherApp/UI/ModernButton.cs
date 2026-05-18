@@ -9,14 +9,12 @@ namespace XorCipherApp.UI
     /// </summary>
     public class ModernButton : Button
     {
-        private readonly ColorPalette _palette;
         private Color _baseColor;
         private bool _isHovered = false;
 
-        public ModernButton(ColorPalette palette, string text)
+        public ModernButton(string text, Color baseColor)
         {
-            _palette = palette;
-            _baseColor = _palette.PrimaryDark;
+            _baseColor = baseColor;
             
             Text = text;
             Font = new Font("Segoe UI", 10F, FontStyle.Regular);
@@ -27,14 +25,14 @@ namespace XorCipherApp.UI
             
             // Remove default border
             FlatAppearance.BorderSize = 0;
-            FlatAppearance.MouseOverBackColor = ControlPaint.Lighter(_baseColor, 0.1F);
-            FlatAppearance.MouseDownBackColor = ControlPaint.Darker(_baseColor, 0.1F);
+            FlatAppearance.MouseOverBackColor = LightenColor(_baseColor, 0.1F);
+            FlatAppearance.MouseDownBackColor = DarkenColor(_baseColor, 0.1F);
             
             // Events for hover effect
             MouseEnter += (s, e) => 
             {
                 _isHovered = true;
-                BackColor = ControlPaint.Lighter(_baseColor, 0.15F);
+                BackColor = LightenColor(_baseColor, 0.15F);
                 Invalidate();
             };
             
@@ -46,6 +44,26 @@ namespace XorCipherApp.UI
             };
         }
 
+        private static Color LightenColor(Color color, float factor)
+        {
+            return Color.FromArgb(
+                color.A,
+                Math.Min(255, (int)(color.R * (1 + factor))),
+                Math.Min(255, (int)(color.G * (1 + factor))),
+                Math.Min(255, (int)(color.B * (1 + factor)))
+            );
+        }
+
+        private static Color DarkenColor(Color color, float factor)
+        {
+            return Color.FromArgb(
+                color.A,
+                Math.Max(0, (int)(color.R * (1 - factor))),
+                Math.Max(0, (int)(color.G * (1 - factor))),
+                Math.Max(0, (int)(color.B * (1 - factor)))
+            );
+        }
+
         protected override void OnPaint(PaintEventArgs e)
         {
             base.OnPaint(e);
@@ -54,7 +72,7 @@ namespace XorCipherApp.UI
             if (_isHovered)
             {
                 ControlPaint.DrawBorder(e.Graphics, ClientRectangle, 
-                    _palette.PrimaryLight, ButtonBorderStyle.Solid);
+                    ColorPalette.BorderFocus, ButtonBorderStyle.Solid);
             }
         }
     }
