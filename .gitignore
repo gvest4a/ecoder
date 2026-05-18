@@ -1,23 +1,82 @@
 ```
 # Build artifacts
-*.obj
+bin/
+obj/
 *.exe
 *.dll
 *.pdb
 *.userprefs
 *.cache
-*.tmp
+*.compiled
 
 # Dependencies
 packages/
-bin/
-obj/
+node_modules/
+vendor/
 
 # Logs
 *.log
 
+# OS generated files
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Icon?
+desktop.ini
+
+# Visual Studio Code
+.vscode/
+
+# Visual Studio/Visual Studio Code temporary files
+*.tmp
+*.temp
+*.bak
+
 # User-specific files
-.vs/
 *.user
+*.userosscache
 *.suo
+*.userprefs
+
+# Environment specific settings
+.env
+.env.local
+*.env*
+
+# Testing
+TestResults/
+
+# IDE
+.idea/
+*.swp
+*.swo
+
+# Coverage
+coverage/
+htmlcov/
+*.coverage
+
+# Compressed files
+*.zip
+*.gz
+*.tar
+*.tgz
+*.bz2
+*.xz
+*.7z
+*.rar
+*.zst
+*.lz4
+*.lzh
+*.cab
+*.arj
+*.rpm
+*.deb
+*.Z
+*.lz
+*.lzo
+*.tar.gz
+*.tar.bz2
+*.tar.xz
+*.tar.zst
 ```
