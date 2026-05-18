@@ -6,64 +6,62 @@
 [Rr]eleases/
 x64/
 x86/
-[Dd]epends/
-[Mm]onoAndroid/
-[Mm]onoTouch/
+build/
+bld/
+[Bb]in/
+[Oo]bj/
 
-# Visual Studio Code
-.vscode/
-
-# Visual Studio
+# Visual Studio files
+.vs/
 *.user
 *.userosscache
 *.suo
 *.csproj.user
-*.csproj.user.userosscache
 *.vbproj.user
-*.vbproj.user.userosscache
 *.fsproj.user
-*.fsproj.user.userosscache
-*.vcxproj.user
-*.vcxproj.User.userosscache
+*.userprefs
 
-# IDE
-.idea/
-*.swp
-*.swo
+# Visual Studio Code files
+.vscode/
+
+# Compiled binaries
+*.exe
+*.dll
+*.so
+*.dylib
 
 # Logs
 *.log
-
-# OS generated files
-.DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
-Thumbs.db
-desktop.ini
 
 # Environment
 .env
 .env.local
 *.env.*
 
-# Temp files
+# OS generated files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Packages
+*.tar.gz
+*.zip
+*.7z
+*.rar
+
+# IDE
+.idea/
+*.swp
+*.swo
 *.tmp
-*.temp
-[Tt]emp/
 
-# Coverage
-coverage/
-htmlcov/
-.coverage
-
-# NuGet
-packages/
-*.nupkg
-
-# Bin and Obj folders
-bin/
-obj/
+# Dependencies
+node_modules/
+venv/
+.venv/
+__pycache__/
+.mypy_cache/
+.pytest_cache/
+target/
+.gradle/
 ```
