@@ -2,81 +2,37 @@
 # Build artifacts
 bin/
 obj/
-*.exe
 *.dll
+*.exe
 *.pdb
 *.userprefs
-*.cache
-*.compiled
 
 # Dependencies
 packages/
 node_modules/
-vendor/
 
 # Logs
 *.log
 
-# OS generated files
-.DS_Store
-Thumbs.db
-ehthumbs.db
-Icon?
-desktop.ini
-
-# Visual Studio Code
-.vscode/
-
-# Visual Studio/Visual Studio Code temporary files
-*.tmp
-*.temp
-*.bak
-
-# User-specific files
-*.user
-*.userosscache
-*.suo
-*.userprefs
-
-# Environment specific settings
+# Environment
 .env
 .env.local
-*.env*
+*.env.*
 
-# Testing
-TestResults/
-
-# IDE
+# Editors
+.vscode/
 .idea/
 *.swp
 *.swo
 
-# Coverage
+# OS
+.DS_Store
+Thumbs.db
+
+# Test and coverage
 coverage/
 htmlcov/
 *.coverage
-
-# Compressed files
-*.zip
-*.gz
-*.tar
-*.tgz
-*.bz2
-*.xz
-*.7z
-*.rar
-*.zst
-*.lz4
-*.lzh
-*.cab
-*.arj
-*.rpm
-*.deb
-*.Z
-*.lz
-*.lzo
-*.tar.gz
-*.tar.bz2
-*.tar.xz
-*.tar.zst
+.coverage.*
+.nyc_output/
 ```
