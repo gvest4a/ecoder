@@ -1,19 +1,28 @@
 using System;
 using System.Drawing;
-using System.Drawing.Drawing2D;
 using System.IO;
-using System.Text;
 using System.Windows.Forms;
+using XorCipherApp.Core;
+using XorCipherApp.Models;
+using XorCipherApp.Services;
+using XorCipherApp.UI;
 
 namespace XorCipherApp
 {
-    public partial class MainForm : Form
+    /// <summary>
+    /// Main form for XOR Cipher application with responsive design and grayscale theme
+    /// </summary>
+    public partial class MainForm : ResponsiveForm
     {
+        private readonly IXorCipher _cipher;
+        private readonly IFileService _fileService;
+        private readonly CipherConfig _config;
+
+        // UI Components - Encrypt Tab
         private TabControl tabControl = null!;
         private TabPage tabEncrypt = null!;
         private TabPage tabDecrypt = null!;
         
-        // Encrypt controls
         private TextBox txtEncryptInput = null!;
         private TextBox txtEncryptKey = null!;
         private TextBox txtEncryptResult = null!;
@@ -24,7 +33,7 @@ namespace XorCipherApp
         private Panel leftPanelEncrypt = null!;
         private Panel rightPanelEncrypt = null!;
 
-        // Decrypt controls
+        // UI Components - Decrypt Tab
         private TextBox txtDecryptInput = null!;
         private TextBox txtDecryptKey = null!;
         private TextBox txtDecryptResult = null!;
@@ -35,19 +44,17 @@ namespace XorCipherApp
         private Panel leftPanelDecrypt = null!;
         private Panel rightPanelDecrypt = null!;
 
-        // Color palette - Muted Purple
-        private readonly Color bgColor = Color.FromArgb(245, 242, 250);
-        private readonly Color panelColor = Color.FromArgb(255, 255, 255);
-        private readonly Color primaryColor = Color.FromArgb(108, 92, 153);
-        private readonly Color primaryDark = Color.FromArgb(88, 72, 123);
-        private readonly Color accentColor = Color.FromArgb(149, 117, 205);
-        private readonly Color textColor = Color.FromArgb(62, 52, 81);
-        private readonly Color successColor = Color.FromArgb(76, 175, 80);
-        private readonly Color dangerColor = Color.FromArgb(229, 115, 115);
-        private readonly Color infoColor = Color.FromArgb(66, 165, 245);
-
-        public MainForm()
+        public MainForm() : this(new XorCipher(), new FileService(), new CipherConfig())
         {
+        }
+
+        // Constructor for dependency injection (extensible architecture)
+        public MainForm(IXorCipher cipher, IFileService fileService, CipherConfig config)
+        {
+            _cipher = cipher;
+            _fileService = fileService;
+            _config = config;
+            
             InitializeComponent();
         }
 
@@ -55,22 +62,21 @@ namespace XorCipherApp
         {
             this.SuspendLayout();
             
-            // Main form settings - Modern design with rounded corners simulation
+            // Main form settings - Modern design with grayscale theme
             this.AutoScaleDimensions = new SizeF(7F, 15F);
             this.AutoScaleMode = AutoScaleMode.Font;
             this.ClientSize = new Size(1100, 700);
+            this.MinimumSize = new Size(900, 600);
             this.Text = "XOR Шифрование текста";
-            this.FormBorderStyle = FormBorderStyle.FixedSingle;
-            this.MaximizeBox = false;
             this.StartPosition = FormStartPosition.CenterScreen;
-            this.BackColor = bgColor;
-            this.Padding = new Padding(20);
+            this.BackColor = ColorPalette.BgLight;
+            this.Padding = new Padding(15);
 
             // TabControl with custom styling
             tabControl = new TabControl();
             tabControl.Dock = DockStyle.Fill;
             tabControl.Font = new Font("Segoe UI", 10F);
-            tabControl.ItemSize = new Size(120, 35);
+            tabControl.ItemSize = new Size(140, 40);
             tabControl.SizeMode = TabSizeMode.Fixed;
             
             // Custom draw for tabs
@@ -103,8 +109,8 @@ namespace XorCipherApp
             Rectangle tabBounds = e.Bounds;
             bool isSelected = (e.State & DrawItemState.Selected) == DrawItemState.Selected;
             
-            // Background
-            using Brush brush = new SolidBrush(isSelected ? primaryColor : Color.FromArgb(230, 225, 235));
+            // Background with gradient for selected tab
+            using Brush brush = new SolidBrush(isSelected ? ColorPalette.PrimaryDark : ColorPalette.BgMedium);
             e.Graphics.FillRectangle(brush, tabBounds);
             
             // Text
@@ -114,272 +120,156 @@ namespace XorCipherApp
                 LineAlignment = StringAlignment.Center
             };
             
-            using Brush textBrush = new SolidBrush(isSelected ? Color.White : textColor);
+            using Brush textBrush = new SolidBrush(isSelected ? Color.White : ColorPalette.TextSecondary);
             e.Graphics.DrawString(page.Text, new Font("Segoe UI Semibold", 10F), textBrush, tabBounds, stringFormat);
             
-            // Rounded top corners for selected tab
+            // Highlight line for selected tab
             if (isSelected)
             {
-                using Pen pen = new Pen(primaryColor, 2);
-                e.Graphics.DrawLine(pen, tabBounds.Left, tabBounds.Bottom - 1, tabBounds.Right, tabBounds.Bottom - 1);
+                using Pen pen = new Pen(ColorPalette.PrimaryDark, 3);
+                e.Graphics.DrawLine(pen, tabBounds.Left + 2, tabBounds.Bottom - 1, tabBounds.Right - 2, tabBounds.Bottom - 1);
             }
         }
 
         private void SetupEncryptTab()
         {
-            tabEncrypt.BackColor = bgColor;
+            tabEncrypt.BackColor = ColorPalette.BgLight;
             tabEncrypt.AutoScroll = true;
-            tabEncrypt.Padding = new Padding(0);
+            tabEncrypt.Padding = new Padding(15);
 
             // Left Panel - Input and Controls
-            leftPanelEncrypt = CreateModernPanel(20, 20, 500, 600);
+            leftPanelEncrypt = ControlFactory.CreateModernPanel(15, 15, 480, 580);
             tabEncrypt.Controls.Add(leftPanelEncrypt);
 
             // Right Panel - Output
-            rightPanelEncrypt = CreateModernPanel(540, 20, 500, 600);
+            rightPanelEncrypt = ControlFactory.CreateModernPanel(520, 15, 480, 580);
             tabEncrypt.Controls.Add(rightPanelEncrypt);
 
             // === LEFT PANEL CONTENT ===
-            int yOffset = 25;
+            int yOffset = 20;
             
-            Label lblInput = CreateStyledLabel("Исходный текст:", 20, yOffset, 12F);
+            Label lblInput = ControlFactory.CreateStyledLabel("Исходный текст:", 20, yOffset, 12F, true);
             leftPanelEncrypt.Controls.Add(lblInput);
             yOffset += 35;
 
-            txtEncryptInput = CreateModernTextBox(20, yOffset, 460, 140, false);
+            txtEncryptInput = ControlFactory.CreateModernTextBox(20, yOffset, 440, 150, false);
             leftPanelEncrypt.Controls.Add(txtEncryptInput);
-            yOffset += 160;
+            yOffset += 175;
 
-            Label lblKey = CreateStyledLabel("Ключ шифрования:", 20, yOffset, 11F);
+            Label lblKey = ControlFactory.CreateStyledLabel("Ключ шифрования:", 20, yOffset, 11F, true);
             leftPanelEncrypt.Controls.Add(lblKey);
             yOffset += 30;
 
-            txtEncryptKey = CreateModernTextBox(20, yOffset, 460, 40, false);
-            txtEncryptKey.Text = "SecretKey123";
+            txtEncryptKey = ControlFactory.CreateModernTextBox(20, yOffset, 440, 40, false);
+            txtEncryptKey.Text = _config.DefaultKey;
             leftPanelEncrypt.Controls.Add(txtEncryptKey);
-            yOffset += 60;
+            yOffset += 65;
 
             // Buttons in left panel
-            btnLoadEncryptFile = CreateModernButton("📁 Загрузить из файла", 20, yOffset, 200, 42, infoColor);
+            btnLoadEncryptFile = ControlFactory.CreateModernButton("📁 Загрузить из файла", 20, yOffset, 195, 45, ColorPalette.Info);
             btnLoadEncryptFile.Click += BtnLoadEncryptFile_Click;
             leftPanelEncrypt.Controls.Add(btnLoadEncryptFile);
 
-            btnEncrypt = CreateModernButton("🔒 Зашифровать", 240, yOffset, 200, 42, successColor);
+            btnEncrypt = ControlFactory.CreateModernButton("🔒 Зашифровать", 235, yOffset, 195, 45, ColorPalette.PrimaryMedium);
             btnEncrypt.Click += BtnEncrypt_Click;
             leftPanelEncrypt.Controls.Add(btnEncrypt);
-            yOffset += 55;
+            yOffset += 60;
 
-            btnClearEncrypt = CreateModernButton("🗑️ Очистить всё", 20, yOffset, 200, 42, dangerColor);
+            btnClearEncrypt = ControlFactory.CreateModernButton("🗑️ Очистить всё", 20, yOffset, 195, 45, ColorPalette.Error);
             btnClearEncrypt.Click += BtnClearEncrypt_Click;
             leftPanelEncrypt.Controls.Add(btnClearEncrypt);
 
             // === RIGHT PANEL CONTENT ===
-            Label lblResult = CreateStyledLabel("Результат (HEX):", 20, 25, 12F);
+            Label lblResult = ControlFactory.CreateStyledLabel("Результат (HEX):", 20, 20, 12F, true);
             rightPanelEncrypt.Controls.Add(lblResult);
 
-            txtEncryptResult = CreateModernTextBox(20, 60, 460, 420, true);
+            txtEncryptResult = ControlFactory.CreateModernTextBox(20, 55, 440, 430, true);
+            txtEncryptResult.BackColor = ColorPalette.SurfaceWhite;
             rightPanelEncrypt.Controls.Add(txtEncryptResult);
 
-            btnSaveEncryptResult = CreateModernButton("💾 Сохранить результат", 20, 500, 460, 45, primaryColor);
+            btnSaveEncryptResult = ControlFactory.CreateModernButton("💾 Сохранить результат", 20, 510, 440, 50, ColorPalette.PrimaryDark);
             btnSaveEncryptResult.Click += BtnSaveEncryptResult_Click;
             rightPanelEncrypt.Controls.Add(btnSaveEncryptResult);
         }
 
         private void SetupDecryptTab()
         {
-            tabDecrypt.BackColor = bgColor;
+            tabDecrypt.BackColor = ColorPalette.BgLight;
             tabDecrypt.AutoScroll = true;
-            tabDecrypt.Padding = new Padding(0);
+            tabDecrypt.Padding = new Padding(15);
 
             // Left Panel - Input and Controls
-            leftPanelDecrypt = CreateModernPanel(20, 20, 500, 600);
+            leftPanelDecrypt = ControlFactory.CreateModernPanel(15, 15, 480, 580);
             tabDecrypt.Controls.Add(leftPanelDecrypt);
 
             // Right Panel - Output
-            rightPanelDecrypt = CreateModernPanel(540, 20, 500, 600);
+            rightPanelDecrypt = ControlFactory.CreateModernPanel(520, 15, 480, 580);
             tabDecrypt.Controls.Add(rightPanelDecrypt);
 
             // === LEFT PANEL CONTENT ===
-            int yOffset = 25;
+            int yOffset = 20;
             
-            Label lblInput = CreateStyledLabel("Зашифрованный текст (HEX):", 20, yOffset, 12F);
+            Label lblInput = ControlFactory.CreateStyledLabel("Зашифрованный текст (HEX):", 20, yOffset, 12F, true);
             leftPanelDecrypt.Controls.Add(lblInput);
             yOffset += 35;
 
-            txtDecryptInput = CreateModernTextBox(20, yOffset, 460, 140, false);
+            txtDecryptInput = ControlFactory.CreateModernTextBox(20, yOffset, 440, 150, false);
             leftPanelDecrypt.Controls.Add(txtDecryptInput);
-            yOffset += 160;
+            yOffset += 175;
 
-            Label lblKey = CreateStyledLabel("Ключ расшифрования:", 20, yOffset, 11F);
+            Label lblKey = ControlFactory.CreateStyledLabel("Ключ расшифрования:", 20, yOffset, 11F, true);
             leftPanelDecrypt.Controls.Add(lblKey);
             yOffset += 30;
 
-            txtDecryptKey = CreateModernTextBox(20, yOffset, 460, 40, false);
-            txtDecryptKey.Text = "SecretKey123";
+            txtDecryptKey = ControlFactory.CreateModernTextBox(20, yOffset, 440, 40, false);
+            txtDecryptKey.Text = _config.DefaultKey;
             leftPanelDecrypt.Controls.Add(txtDecryptKey);
-            yOffset += 60;
+            yOffset += 65;
 
             // Buttons in left panel
-            btnLoadDecryptFile = CreateModernButton("📁 Загрузить HEX файл", 20, yOffset, 200, 42, infoColor);
+            btnLoadDecryptFile = ControlFactory.CreateModernButton("📁 Загрузить HEX файл", 20, yOffset, 195, 45, ColorPalette.Info);
             btnLoadDecryptFile.Click += BtnLoadDecryptFile_Click;
             leftPanelDecrypt.Controls.Add(btnLoadDecryptFile);
 
-            btnDecrypt = CreateModernButton("🔓 Расшифровать", 240, yOffset, 200, 42, successColor);
+            btnDecrypt = ControlFactory.CreateModernButton("🔓 Расшифровать", 235, yOffset, 195, 45, ColorPalette.PrimaryMedium);
             btnDecrypt.Click += BtnDecrypt_Click;
             leftPanelDecrypt.Controls.Add(btnDecrypt);
-            yOffset += 55;
+            yOffset += 60;
 
-            btnClearDecrypt = CreateModernButton("🗑️ Очистить всё", 20, yOffset, 200, 42, dangerColor);
+            btnClearDecrypt = ControlFactory.CreateModernButton("🗑️ Очистить всё", 20, yOffset, 195, 45, ColorPalette.Error);
             btnClearDecrypt.Click += BtnClearDecrypt_Click;
             leftPanelDecrypt.Controls.Add(btnClearDecrypt);
 
             // === RIGHT PANEL CONTENT ===
-            Label lblResult = CreateStyledLabel("Результат:", 20, 25, 12F);
+            Label lblResult = ControlFactory.CreateStyledLabel("Результат:", 20, 20, 12F, true);
             rightPanelDecrypt.Controls.Add(lblResult);
 
-            txtDecryptResult = CreateModernTextBox(20, 60, 460, 420, true);
+            txtDecryptResult = ControlFactory.CreateModernTextBox(20, 55, 440, 430, true);
+            txtDecryptResult.BackColor = ColorPalette.SurfaceWhite;
             rightPanelDecrypt.Controls.Add(txtDecryptResult);
 
-            btnSaveDecryptResult = CreateModernButton("💾 Сохранить результат", 20, 500, 460, 45, primaryColor);
+            btnSaveDecryptResult = ControlFactory.CreateModernButton("💾 Сохранить результат", 20, 510, 440, 50, ColorPalette.PrimaryDark);
             btnSaveDecryptResult.Click += BtnSaveDecryptResult_Click;
             rightPanelDecrypt.Controls.Add(btnSaveDecryptResult);
         }
 
-        private Panel CreateModernPanel(int x, int y, int width, int height)
+        protected override void OnScaleChanged(EventArgs e)
         {
-            Panel panel = new Panel();
-            panel.Location = new Point(x, y);
-            panel.Size = new Size(width, height);
-            panel.BackColor = panelColor;
-            panel.BorderStyle = BorderStyle.None;
+            base.OnScaleChanged(e);
+            // Apply scaling to panels and controls based on window size
+            // This enables responsive behavior
+            var scaleFactor = ScaleFactor;
             
-            // Shadow effect simulation using Padding and BackColor
-            panel.Padding = new Padding(15);
-            
-            return panel;
-        }
-
-        private Label CreateStyledLabel(string text, int x, int y, float fontSize = 11F)
-        {
-            Label label = new Label();
-            label.Text = text;
-            label.Location = new Point(x, y);
-            label.AutoSize = true;
-            label.Font = new Font("Segoe UI Semibold", fontSize, FontStyle.Regular);
-            label.ForeColor = textColor;
-            return label;
-        }
-
-        private TextBox CreateModernTextBox(int x, int y, int width, int height, bool readOnly)
-        {
-            TextBox textBox = new TextBox();
-            textBox.Location = new Point(x, y);
-            textBox.Size = new Size(width, height);
-            textBox.Multiline = true;
-            textBox.ScrollBars = ScrollBars.Vertical;
-            textBox.ReadOnly = readOnly;
-            textBox.Font = new Font("Consolas", 10F);
-            textBox.BorderStyle = BorderStyle.None;
-            textBox.BackColor = Color.FromArgb(250, 248, 252);
-            textBox.Padding = new Padding(10);
-            
-            // Add a subtle border
-            textBox.GotFocus += (s, e) => {
-                var tb = (TextBox)s!;
-                tb.BackColor = Color.White;
-            };
-            textBox.LostFocus += (s, e) => {
-                var tb = (TextBox)s!;
-                tb.BackColor = Color.FromArgb(250, 248, 252);
-            };
-            
-            return textBox;
-        }
-
-        private Button CreateModernButton(string text, int x, int y, int width, int height, Color baseColor)
-        {
-            Button button = new Button();
-            button.Text = text;
-            button.Location = new Point(x, y);
-            button.Size = new Size(width, height);
-            button.Font = new Font("Segoe UI Semibold", 10.5F, FontStyle.Regular);
-            button.FlatStyle = FlatStyle.Flat;
-            button.FlatAppearance.BorderSize = 0;
-            button.Cursor = Cursors.Hand;
-            button.BackColor = baseColor;
-            button.ForeColor = Color.White;
-            button.FlatAppearance.MouseOverBackColor = ControlPaint.Light(baseColor, 0.1f);
-            button.FlatAppearance.MouseDownBackColor = ControlPaint.Dark(baseColor, 0.1f);
-            
-            // Round corners simulation (requires custom drawing or using Region, keeping it simple for now)
-            button.FlatAppearance.BorderColor = baseColor;
-            
-            return button;
-        }
-
-        private string XorCipher(string text, string key)
-        {
-            if (string.IsNullOrEmpty(key))
+            // Adjust panel sizes proportionally
+            if (leftPanelEncrypt != null && rightPanelEncrypt != null)
             {
-                MessageBox.Show("Ключ не может быть пустым!", "Ошибка", 
-                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return string.Empty;
-            }
-
-            byte[] textBytes = Encoding.UTF8.GetBytes(text);
-            byte[] keyBytes = Encoding.UTF8.GetBytes(key);
-            
-            byte[] resultBytes = new byte[textBytes.Length];
-            
-            for (int i = 0; i < textBytes.Length; i++)
-            {
-                resultBytes[i] = (byte)(textBytes[i] ^ keyBytes[i % keyBytes.Length]);
-            }
-            
-            // Convert to hex string for display
-            StringBuilder sb = new StringBuilder();
-            foreach (byte b in resultBytes)
-            {
-                sb.Append(b.ToString("X2"));
-            }
-            
-            return sb.ToString();
-        }
-
-        private string XorDecipher(string hexText, string key)
-        {
-            if (string.IsNullOrEmpty(key))
-            {
-                MessageBox.Show("Ключ не может быть пустым!", "Ошибка", 
-                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return string.Empty;
-            }
-
-            try
-            {
-                // Convert from hex string to bytes
-                hexText = hexText.Replace(" ", "").Replace("\n", "").Replace("\r", "");
-                byte[] textBytes = new byte[hexText.Length / 2];
-                for (int i = 0; i < hexText.Length; i += 2)
-                {
-                    textBytes[i / 2] = Convert.ToByte(hexText.Substring(i, 2), 16);
-                }
+                int panelWidth = (int)(480 * scaleFactor);
+                int panelHeight = (int)(580 * scaleFactor);
+                int gap = (int)(20 * scaleFactor);
                 
-                byte[] keyBytes = Encoding.UTF8.GetBytes(key);
-                byte[] resultBytes = new byte[textBytes.Length];
-                
-                for (int i = 0; i < textBytes.Length; i++)
-                {
-                    resultBytes[i] = (byte)(textBytes[i] ^ keyBytes[i % keyBytes.Length]);
-                }
-                
-                return Encoding.UTF8.GetString(resultBytes);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Ошибка при расшифровке: {ex.Message}", "Ошибка", 
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return string.Empty;
+                leftPanelEncrypt.Size = new Size(panelWidth, panelHeight);
+                rightPanelEncrypt.Size = new Size(panelWidth, panelHeight);
+                rightPanelEncrypt.Location = new Point((int)((480 + gap) * scaleFactor), (int)(15 * scaleFactor));
             }
         }
 
@@ -394,11 +284,15 @@ namespace XorCipherApp
                     MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
-            
-            string result = XorCipher(inputText, key);
-            if (!string.IsNullOrEmpty(result))
+
+            try
             {
+                string result = _cipher.Encrypt(inputText, key);
                 txtEncryptResult.Text = result;
+            }
+            catch (ArgumentException ex)
+            {
+                MessageBox.Show(ex.Message, "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -406,118 +300,123 @@ namespace XorCipherApp
         {
             string inputText = txtDecryptInput.Text.Trim();
             string key = txtDecryptKey.Text;
-            
+
             if (string.IsNullOrEmpty(inputText))
             {
-                MessageBox.Show("Введите зашифрованный текст (в формате HEX)!", "Предупреждение", 
+                MessageBox.Show("Введите зашифрованный текст (в формате HEX)!", "Предупреждение",
                     MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
-            
-            string result = XorDecipher(inputText, key);
-            if (!string.IsNullOrEmpty(result))
+
+            try
             {
+                string result = _cipher.Decrypt(inputText, key);
                 txtDecryptResult.Text = result;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка при расшифровке: {ex.Message}", "Ошибка", 
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
-        private void BtnLoadEncryptFile_Click(object? sender, EventArgs e)
+        private async void BtnLoadEncryptFile_Click(object? sender, EventArgs e)
         {
             using OpenFileDialog openFileDialog = new OpenFileDialog();
-            openFileDialog.Filter = "Текстовые файлы (*.txt)|*.txt|Все файлы (*.*)|*.*";
+            openFileDialog.Filter = _config.InputFileFilter;
             openFileDialog.Title = "Выберите файл для загрузки";
-            
+
             if (openFileDialog.ShowDialog() == DialogResult.OK)
             {
                 try
                 {
-                    string content = File.ReadAllText(openFileDialog.FileName, Encoding.UTF8);
+                    string content = await _fileService.ReadFileAsync(openFileDialog.FileName);
                     txtEncryptInput.Text = content;
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show($"Ошибка при чтении файла: {ex.Message}", "Ошибка", 
+                    MessageBox.Show($"Ошибка при чтении файла: {ex.Message}", "Ошибка",
                         MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
         }
 
-        private void BtnLoadDecryptFile_Click(object? sender, EventArgs e)
+        private async void BtnLoadDecryptFile_Click(object? sender, EventArgs e)
         {
             using OpenFileDialog openFileDialog = new OpenFileDialog();
-            openFileDialog.Filter = "Файлы (*.hex;*.txt)|*.hex;*.txt|Все файлы (*.*)|*.*";
+            openFileDialog.Filter = _config.HexFileFilter;
             openFileDialog.Title = "Выберите HEX файл для расшифровки";
-            
+
             if (openFileDialog.ShowDialog() == DialogResult.OK)
             {
                 try
                 {
-                    string content = File.ReadAllText(openFileDialog.FileName, Encoding.UTF8);
+                    string content = await _fileService.ReadFileAsync(openFileDialog.FileName);
                     txtDecryptInput.Text = content.Trim();
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show($"Ошибка при чтении файла: {ex.Message}", "Ошибка", 
+                    MessageBox.Show($"Ошибка при чтении файла: {ex.Message}", "Ошибка",
                         MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
         }
 
-        private void BtnSaveEncryptResult_Click(object? sender, EventArgs e)
+        private async void BtnSaveEncryptResult_Click(object? sender, EventArgs e)
         {
             if (string.IsNullOrEmpty(txtEncryptResult.Text))
             {
-                MessageBox.Show("Нет результата для сохранения!", "Предупреждение", 
+                MessageBox.Show("Нет результата для сохранения!", "Предупреждение",
                     MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
-            
+
             using SaveFileDialog saveFileDialog = new SaveFileDialog();
-            saveFileDialog.Filter = "HEX файлы (*.hex)|*.hex|Текстовые файлы (*.txt)|*.txt|Все файлы (*.*)|*.*";
+            saveFileDialog.Filter = $"HEX файлы (*.hex)|*.hex|{_config.InputFileFilter}";
             saveFileDialog.Title = "Сохранить результат шифрования";
-            saveFileDialog.FileName = "encrypted.hex";
-            
+            saveFileDialog.FileName = _config.OutputHexFileName;
+
             if (saveFileDialog.ShowDialog() == DialogResult.OK)
             {
                 try
                 {
-                    File.WriteAllText(saveFileDialog.FileName, txtEncryptResult.Text, Encoding.UTF8);
-                    MessageBox.Show("Результат успешно сохранен!", "Успех", 
+                    await _fileService.WriteFileAsync(saveFileDialog.FileName, txtEncryptResult.Text);
+                    MessageBox.Show("Результат успешно сохранен!", "Успех",
                         MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show($"Ошибка при сохранении файла: {ex.Message}", "Ошибка", 
+                    MessageBox.Show($"Ошибка при сохранении файла: {ex.Message}", "Ошибка",
                         MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
         }
 
-        private void BtnSaveDecryptResult_Click(object? sender, EventArgs e)
+        private async void BtnSaveDecryptResult_Click(object? sender, EventArgs e)
         {
             if (string.IsNullOrEmpty(txtDecryptResult.Text))
             {
-                MessageBox.Show("Нет результата для сохранения!", "Предупреждение", 
+                MessageBox.Show("Нет результата для сохранения!", "Предупреждение",
                     MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
-            
+
             using SaveFileDialog saveFileDialog = new SaveFileDialog();
-            saveFileDialog.Filter = "Текстовые файлы (*.txt)|*.txt|Все файлы (*.*)|*.*";
+            saveFileDialog.Filter = _config.InputFileFilter;
             saveFileDialog.Title = "Сохранить результат расшифровки";
-            saveFileDialog.FileName = "decrypted.txt";
-            
+            saveFileDialog.FileName = _config.OutputTextFileName;
+
             if (saveFileDialog.ShowDialog() == DialogResult.OK)
             {
                 try
                 {
-                    File.WriteAllText(saveFileDialog.FileName, txtDecryptResult.Text, Encoding.UTF8);
-                    MessageBox.Show("Результат успешно сохранен!", "Успех", 
+                    await _fileService.WriteFileAsync(saveFileDialog.FileName, txtDecryptResult.Text);
+                    MessageBox.Show("Результат успешно сохранен!", "Успех",
                         MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show($"Ошибка при сохранении файла: {ex.Message}", "Ошибка", 
+                    MessageBox.Show($"Ошибка при сохранении файла: {ex.Message}", "Ошибка",
                         MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
@@ -527,14 +426,14 @@ namespace XorCipherApp
         {
             txtEncryptInput.Clear();
             txtEncryptResult.Clear();
-            txtEncryptKey.Text = "SecretKey123";
+            txtEncryptKey.Text = _config.DefaultKey;
         }
 
         private void BtnClearDecrypt_Click(object? sender, EventArgs e)
         {
             txtDecryptInput.Clear();
             txtDecryptResult.Clear();
-            txtDecryptKey.Text = "SecretKey123";
+            txtDecryptKey.Text = _config.DefaultKey;
         }
     }
 }
