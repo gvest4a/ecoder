@@ -25,7 +25,10 @@ namespace XorCipherApp.UI
             
             // Draw subtle border
             ControlPaint.DrawBorder(e.Graphics, ClientRectangle, 
-                ColorPalette.BorderLight, ButtonBorderStyle.Solid);
+                ColorPalette.BorderLight, 1, ButtonBorderStyle.Solid,
+                ColorPalette.BorderLight, 1, ButtonBorderStyle.Solid,
+                ColorPalette.BorderLight, 1, ButtonBorderStyle.Solid,
+                ColorPalette.BorderLight, 1, ButtonBorderStyle.Solid);
             
             // Optional: Add subtle shadow effect
             using (var shadowBrush = new SolidBrush(Color.FromArgb(20, 0, 0, 0)))

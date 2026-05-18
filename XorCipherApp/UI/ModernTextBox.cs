@@ -46,12 +46,18 @@ namespace XorCipherApp.UI
             if (_isFocused)
             {
                 ControlPaint.DrawBorder(e.Graphics, ClientRectangle, 
-                    ColorPalette.BorderFocus, ButtonBorderStyle.Solid);
+                    ColorPalette.BorderFocus, 2, ButtonBorderStyle.Solid,
+                    ColorPalette.BorderFocus, 2, ButtonBorderStyle.Solid,
+                    ColorPalette.BorderFocus, 2, ButtonBorderStyle.Solid,
+                    ColorPalette.BorderFocus, 2, ButtonBorderStyle.Solid);
             }
             else
             {
                 ControlPaint.DrawBorder(e.Graphics, ClientRectangle, 
-                    ColorPalette.BorderLight, ButtonBorderStyle.Solid);
+                    ColorPalette.BorderLight, 1, ButtonBorderStyle.Solid,
+                    ColorPalette.BorderLight, 1, ButtonBorderStyle.Solid,
+                    ColorPalette.BorderLight, 1, ButtonBorderStyle.Solid,
+                    ColorPalette.BorderLight, 1, ButtonBorderStyle.Solid);
             }
         }
     }
