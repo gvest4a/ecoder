@@ -4,28 +4,20 @@ using System.Windows.Forms;
 namespace XorCipherApp.UI
 {
     /// <summary>
-    /// Helper class for creating styled UI controls with improved scrollbars
+    /// Helper class for creating styled UI controls with modern design
     /// </summary>
     public static class ControlFactory
     {
         /// <summary>
-        /// Creates a modern panel with subtle shadow effect
+        /// Creates a modern panel with subtle border
         /// </summary>
-        public static Panel CreateModernPanel(int x, int y, int width, int height)
+        public static Panel CreateModernPanel(int x, int y, int width, int height, ColorPalette palette)
         {
-            Panel panel = new Panel();
+            Panel panel = new ShadowPanel(palette);
             panel.Location = new Point(x, y);
             panel.Size = new Size(width, height);
-            panel.BackColor = ColorPalette.SurfaceWhite;
-            panel.BorderStyle = BorderStyle.None;
-            panel.Padding = new Padding(20);
-            
-            // Add subtle border
-            panel.Paint += (s, e) =>
-            {
-                using var pen = new Pen(ColorPalette.BorderLight, 1);
-                e.Graphics.DrawRectangle(pen, 0, 0, panel.Width - 1, panel.Height - 1);
-            };
+            panel.Dock = DockStyle.None;
+            panel.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right | AnchorStyles.Bottom;
             
             return panel;
         }
@@ -33,51 +25,32 @@ namespace XorCipherApp.UI
         /// <summary>
         /// Creates a styled label
         /// </summary>
-        public static Label CreateStyledLabel(string text, int x, int y, float fontSize = 11F, bool bold = false)
+        public static Label CreateStyledLabel(string text, int x, int y, float fontSize = 11F, bool bold = false, ColorPalette? palette = null)
         {
+            palette ??= new ColorPalette();
             Label label = new Label();
             label.Text = text;
             label.Location = new Point(x, y);
             label.AutoSize = true;
             label.Font = new Font("Segoe UI", fontSize, bold ? FontStyle.Bold : FontStyle.Regular);
-            label.ForeColor = ColorPalette.TextPrimary;
+            label.ForeColor = palette.TextPrimary;
             return label;
         }
 
         /// <summary>
         /// Creates a modern textbox with custom scrollbar styling
         /// </summary>
-        public static TextBox CreateModernTextBox(int x, int y, int width, int height, bool readOnly)
+        public static ModernTextBox CreateModernTextBox(int x, int y, int width, int height, bool readOnly, ColorPalette palette)
         {
-            TextBox textBox = new TextBox();
-            textBox.Location = new Point(x, y);
-            textBox.Size = new Size(width, height);
-            textBox.Multiline = true;
-            textBox.ScrollBars = ScrollBars.Vertical;
-            textBox.ReadOnly = readOnly;
-            textBox.Font = new Font("Consolas", 10F);
-            textBox.BorderStyle = BorderStyle.FixedSingle;
-            textBox.BackColor = ColorPalette.SurfaceLight;
-            textBox.ForeColor = ColorPalette.TextPrimary;
-            
-            // Set padding using SendMessage for better control
-            const int EM_SETMARGINS = 0xD3;
-            const int EC_LEFTMARGIN = 0x1;
-            const int EC_RIGHTMARGIN = 0x2;
-            
-            // Focus events for visual feedback
-            textBox.GotFocus += (s, e) =>
+            var textBox = new ModernTextBox(palette)
             {
-                var tb = (TextBox)s!;
-                tb.BackColor = ColorPalette.SurfaceWhite;
-                tb.BorderStyle = BorderStyle.FixedSingle;
-            };
-            
-            textBox.LostFocus += (s, e) =>
-            {
-                var tb = (TextBox)s!;
-                tb.BackColor = ColorPalette.SurfaceLight;
-                tb.BorderStyle = BorderStyle.FixedSingle;
+                Location = new Point(x, y),
+                Size = new Size(width, height),
+                Multiline = true,
+                ScrollBars = ScrollBars.Vertical,
+                ReadOnly = readOnly,
+                Dock = DockStyle.None,
+                Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right | AnchorStyles.Bottom
             };
             
             return textBox;
@@ -86,54 +59,18 @@ namespace XorCipherApp.UI
         /// <summary>
         /// Creates a modern button with hover effects
         /// </summary>
-        public static Button CreateModernButton(string text, int x, int y, int width, int height, Color baseColor)
+        public static ModernButton CreateModernButton(string text, int x, int y, int width, int height, Color baseColor, ColorPalette palette)
         {
-            Button button = new Button();
-            button.Text = text;
-            button.Location = new Point(x, y);
-            button.Size = new Size(width, height);
-            button.Font = new Font("Segoe UI Semibold", 10.5F, FontStyle.Regular);
-            button.FlatStyle = FlatStyle.Flat;
-            button.FlatAppearance.BorderSize = 0;
-            button.Cursor = Cursors.Hand;
-            button.BackColor = baseColor;
-            button.ForeColor = Color.White;
-            button.FlatAppearance.MouseOverBackColor = ControlPaint.Light(baseColor, 0.1f);
-            button.FlatAppearance.MouseDownBackColor = ControlPaint.Dark(baseColor, 0.1f);
-            button.FlatAppearance.BorderColor = baseColor;
-            
-            // Add rounded corners effect using Region (optional enhancement)
-            button.FlatAppearance.BorderSize = 0;
+            var button = new ModernButton(palette, text)
+            {
+                Location = new Point(x, y),
+                Size = new Size(width, height),
+                BackColor = baseColor,
+                Dock = DockStyle.None,
+                Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right
+            };
             
             return button;
-        }
-
-        /// <summary>
-        /// Custom TextBox with improved scrollbar appearance
-        /// </summary>
-        public class StyledTextBox : TextBox
-        {
-            public StyledTextBox()
-            {
-                this.Multiline = true;
-                this.ScrollBars = ScrollBars.Vertical;
-                this.Font = new Font("Consolas", 10F);
-                this.BorderStyle = BorderStyle.FixedSingle;
-                this.BackColor = ColorPalette.SurfaceLight;
-                this.ForeColor = ColorPalette.TextPrimary;
-            }
-
-            protected override void OnGotFocus(EventArgs e)
-            {
-                base.OnGotFocus(e);
-                this.BackColor = ColorPalette.SurfaceWhite;
-            }
-
-            protected override void OnLostFocus(EventArgs e)
-            {
-                base.OnLostFocus(e);
-                this.BackColor = ColorPalette.SurfaceLight;
-            }
         }
     }
 }
