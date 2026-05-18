@@ -1,35 +1,69 @@
-```
-# Build artifacts
-bin/
-obj/
-*.exe
-*.dll
-*.pdb
-*.userprefs
+```csharp
+# Build results
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+x64/
+x86/
+[Dd]epends/
+[Mm]onoAndroid/
+[Mm]onoTouch/
 
-# Dependencies
-packages/
-node_modules/
-.nuget/
+# Visual Studio Code
+.vscode/
 
-# Logs and temp files
-*.log
-*.tmp
-*.temp
-
-# User-specific files
-.vs/
+# Visual Studio
 *.user
-*.suo
 *.userosscache
-*.sln.docstates
+*.suo
+*.csproj.user
+*.csproj.user.userosscache
+*.vbproj.user
+*.vbproj.user.userosscache
+*.fsproj.user
+*.fsproj.user.userosscache
+*.vcxproj.user
+*.vcxproj.User.userosscache
 
-# Environment specific
+# IDE
+.idea/
+*.swp
+*.swo
+
+# Logs
+*.log
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# Environment
 .env
 .env.local
 *.env.*
 
-# OS generated files
-.DS_Store
-Thumbs.db
+# Temp files
+*.tmp
+*.temp
+[Tt]emp/
+
+# Coverage
+coverage/
+htmlcov/
+.coverage
+
+# NuGet
+packages/
+*.nupkg
+
+# Bin and Obj folders
+bin/
+obj/
 ```
