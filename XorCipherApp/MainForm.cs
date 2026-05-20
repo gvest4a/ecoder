@@ -10,9 +10,9 @@ using XorCipherApp.UI;
 namespace XorCipherApp
 {
     /// <summary>
-    /// Main form for XOR Cipher application with responsive design and grayscale theme
+    /// Main form for XOR Cipher application with fixed layout and grayscale theme
     /// </summary>
-    public partial class MainForm : ResponsiveForm
+    public partial class MainForm : Form
     {
         private readonly IXorCipher _cipher;
         private readonly IFileService _fileService;
@@ -64,9 +64,10 @@ namespace XorCipherApp
             
             // Main form settings - Modern design with grayscale theme
             this.AutoScaleDimensions = new SizeF(7F, 15F);
-            this.AutoScaleMode = AutoScaleMode.Font;
-            this.ClientSize = new Size(1100, 700);
-            this.MinimumSize = new Size(900, 600);
+            this.AutoScaleMode = AutoScaleMode.None;
+            this.ClientSize = new Size(1200, 700);
+            this.FormBorderStyle = FormBorderStyle.FixedSingle;
+            this.MaximizeBox = false;
             this.Text = "XOR Шифрование текста";
             this.StartPosition = FormStartPosition.CenterScreen;
             BackColor = ColorPalette.BgLight;
@@ -78,10 +79,6 @@ namespace XorCipherApp
             tabControl.Font = new Font("Segoe UI", 10F);
             tabControl.ItemSize = new Size(140, 40);
             tabControl.SizeMode = TabSizeMode.Fixed;
-            
-            // Custom draw for tabs
-            tabControl.DrawMode = TabDrawMode.OwnerDrawFixed;
-            tabControl.DrawItem += TabControl_DrawItem;
             
             // Create tabs
             tabEncrypt = new TabPage("Шифрование");
@@ -101,69 +98,26 @@ namespace XorCipherApp
             this.ResumeLayout(false);
         }
 
-        private void TabControl_DrawItem(object? sender, DrawItemEventArgs e)
-        {
-            TabControl tabControl = (TabControl)sender!;
-            TabPage page = tabControl.TabPages[e.Index];
-            
-            Rectangle tabBounds = e.Bounds;
-            bool isSelected = (e.State & DrawItemState.Selected) == DrawItemState.Selected;
-            
-            // Background with gradient for selected tab
-            using Brush brush = new SolidBrush(isSelected ? ColorPalette.PrimaryDark : ColorPalette.BgMedium);
-            e.Graphics.FillRectangle(brush, tabBounds);
-            
-            // Text
-            StringFormat stringFormat = new StringFormat
-            {
-                Alignment = StringAlignment.Center,
-                LineAlignment = StringAlignment.Center
-            };
-            
-            using Brush textBrush = new SolidBrush(isSelected ? Color.White : ColorPalette.TextSecondary);
-            e.Graphics.DrawString(page.Text, new Font("Segoe UI Semibold", 10F), textBrush, tabBounds, stringFormat);
-            
-            // Highlight line for selected tab
-            if (isSelected)
-            {
-                using Pen pen = new Pen(ColorPalette.PrimaryDark, 3);
-                e.Graphics.DrawLine(pen, tabBounds.Left + 2, tabBounds.Bottom - 1, tabBounds.Right - 2, tabBounds.Bottom - 1);
-            }
-        }
-
         private void SetupEncryptTab()
         {
             tabEncrypt.BackColor = ColorPalette.BgLight;
             tabEncrypt.AutoScroll = true;
             tabEncrypt.Padding = new Padding(15);
 
-            // Use TableLayoutPanel for 50/50 split
-            TableLayoutPanel mainLayout = new TableLayoutPanel
-            {
-                Dock = DockStyle.Fill,
-                ColumnCount = 2,
-                RowCount = 1,
-                Padding = new Padding(15),
-                BackColor = ColorPalette.BgLight
-            };
+            // === LEFT PANEL CONTENT (Fixed Position) ===
+            int panelWidth = 550;
+            int panelHeight = 600;
+            int gap = 30;
             
-            // Set columns to 50% each
-            mainLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
-            mainLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
-            
-            tabEncrypt.Controls.Add(mainLayout);
-
             // Left Panel - Input and Controls
-            leftPanelEncrypt = ControlFactory.CreateModernPanel(0, 0, 0, 0);
-            leftPanelEncrypt.Dock = DockStyle.Fill;
-            leftPanelEncrypt.Margin = new Padding(0, 0, 10, 0);
-            mainLayout.Controls.Add(leftPanelEncrypt, 0, 0);
+            leftPanelEncrypt = ControlFactory.CreateModernPanel(15, 15, panelWidth, panelHeight);
+            leftPanelEncrypt.BorderStyle = BorderStyle.FixedSingle;
+            tabEncrypt.Controls.Add(leftPanelEncrypt);
 
             // Right Panel - Output
-            rightPanelEncrypt = ControlFactory.CreateModernPanel(0, 0, 0, 0);
-            rightPanelEncrypt.Dock = DockStyle.Fill;
-            rightPanelEncrypt.Margin = new Padding(10, 0, 0, 0);
-            mainLayout.Controls.Add(rightPanelEncrypt, 1, 0);
+            rightPanelEncrypt = ControlFactory.CreateModernPanel(15 + panelWidth + gap, 15, panelWidth, panelHeight);
+            rightPanelEncrypt.BorderStyle = BorderStyle.FixedSingle;
+            tabEncrypt.Controls.Add(rightPanelEncrypt);
 
             // === LEFT PANEL CONTENT ===
             int yOffset = 20;
@@ -172,8 +126,7 @@ namespace XorCipherApp
             leftPanelEncrypt.Controls.Add(lblInput);
             yOffset += 35;
 
-            txtEncryptInput = ControlFactory.CreateModernTextBox(20, yOffset, 440, 150, false);
-            txtEncryptInput.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            txtEncryptInput = ControlFactory.CreateModernTextBox(20, yOffset, panelWidth - 40, 150, false);
             leftPanelEncrypt.Controls.Add(txtEncryptInput);
             yOffset += 175;
 
@@ -181,26 +134,22 @@ namespace XorCipherApp
             leftPanelEncrypt.Controls.Add(lblKey);
             yOffset += 30;
 
-            txtEncryptKey = ControlFactory.CreateModernTextBox(20, yOffset, 440, 40, false);
-            txtEncryptKey.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            txtEncryptKey = ControlFactory.CreateModernTextBox(20, yOffset, panelWidth - 40, 40, false);
             txtEncryptKey.Text = _config.DefaultKey;
             leftPanelEncrypt.Controls.Add(txtEncryptKey);
             yOffset += 65;
 
             // Buttons in left panel
-            btnLoadEncryptFile = ControlFactory.CreateModernButton("📁 Загрузить из файла", 20, yOffset, 195, 45);
-            btnLoadEncryptFile.Anchor = AnchorStyles.Top | AnchorStyles.Left;
+            btnLoadEncryptFile = ControlFactory.CreateModernButton("📁 Загрузить из файла", 20, yOffset, (panelWidth - 60) / 2 - 5, 45);
             btnLoadEncryptFile.Click += BtnLoadEncryptFile_Click;
             leftPanelEncrypt.Controls.Add(btnLoadEncryptFile);
 
-            btnEncrypt = ControlFactory.CreateModernButton("🔒 Зашифровать", 235, yOffset, 195, 45);
-            btnEncrypt.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            btnEncrypt = ControlFactory.CreateModernButton("🔒 Зашифровать", 20 + (panelWidth - 60) / 2 + 10, yOffset, (panelWidth - 60) / 2 - 5, 45);
             btnEncrypt.Click += BtnEncrypt_Click;
             leftPanelEncrypt.Controls.Add(btnEncrypt);
             yOffset += 60;
 
-            btnClearEncrypt = ControlFactory.CreateModernButton("🗑️ Очистить всё", 20, yOffset, 195, 45);
-            btnClearEncrypt.Anchor = AnchorStyles.Top | AnchorStyles.Left;
+            btnClearEncrypt = ControlFactory.CreateModernButton("🗑️ Очистить всё", 20, yOffset, (panelWidth - 60) / 2 - 5, 45);
             btnClearEncrypt.Click += BtnClearEncrypt_Click;
             leftPanelEncrypt.Controls.Add(btnClearEncrypt);
 
@@ -208,13 +157,11 @@ namespace XorCipherApp
             Label lblResult = ControlFactory.CreateStyledLabel("Результат (HEX):", 20, 20, 12F, true);
             rightPanelEncrypt.Controls.Add(lblResult);
 
-            txtEncryptResult = ControlFactory.CreateModernTextBox(20, 55, 440, 430, true);
-            txtEncryptResult.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right | AnchorStyles.Bottom;
+            txtEncryptResult = ControlFactory.CreateModernTextBox(20, 55, panelWidth - 40, 480, true);
             txtEncryptResult.BackColor = ColorPalette.SurfaceWhite;
             rightPanelEncrypt.Controls.Add(txtEncryptResult);
 
-            btnSaveEncryptResult = ControlFactory.CreateModernButton("💾 Сохранить результат", 20, 510, 440, 50);
-            btnSaveEncryptResult.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            btnSaveEncryptResult = ControlFactory.CreateModernButton("💾 Сохранить результат", 20, 555, panelWidth - 40, 50);
             btnSaveEncryptResult.Click += BtnSaveEncryptResult_Click;
             rightPanelEncrypt.Controls.Add(btnSaveEncryptResult);
         }
@@ -225,33 +172,20 @@ namespace XorCipherApp
             tabDecrypt.AutoScroll = true;
             tabDecrypt.Padding = new Padding(15);
 
-            // Use TableLayoutPanel for 50/50 split
-            TableLayoutPanel mainLayout = new TableLayoutPanel
-            {
-                Dock = DockStyle.Fill,
-                ColumnCount = 2,
-                RowCount = 1,
-                Padding = new Padding(15),
-                BackColor = ColorPalette.BgLight
-            };
+            // === LEFT PANEL CONTENT (Fixed Position) ===
+            int panelWidth = 550;
+            int panelHeight = 600;
+            int gap = 30;
             
-            // Set columns to 50% each
-            mainLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
-            mainLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
-            
-            tabDecrypt.Controls.Add(mainLayout);
-
             // Left Panel - Input and Controls
-            leftPanelDecrypt = ControlFactory.CreateModernPanel(0, 0, 0, 0);
-            leftPanelDecrypt.Dock = DockStyle.Fill;
-            leftPanelDecrypt.Margin = new Padding(0, 0, 10, 0);
-            mainLayout.Controls.Add(leftPanelDecrypt, 0, 0);
+            leftPanelDecrypt = ControlFactory.CreateModernPanel(15, 15, panelWidth, panelHeight);
+            leftPanelDecrypt.BorderStyle = BorderStyle.FixedSingle;
+            tabDecrypt.Controls.Add(leftPanelDecrypt);
 
             // Right Panel - Output
-            rightPanelDecrypt = ControlFactory.CreateModernPanel(0, 0, 0, 0);
-            rightPanelDecrypt.Dock = DockStyle.Fill;
-            rightPanelDecrypt.Margin = new Padding(10, 0, 0, 0);
-            mainLayout.Controls.Add(rightPanelDecrypt, 1, 0);
+            rightPanelDecrypt = ControlFactory.CreateModernPanel(15 + panelWidth + gap, 15, panelWidth, panelHeight);
+            rightPanelDecrypt.BorderStyle = BorderStyle.FixedSingle;
+            tabDecrypt.Controls.Add(rightPanelDecrypt);
 
             // === LEFT PANEL CONTENT ===
             int yOffset = 20;
@@ -260,8 +194,7 @@ namespace XorCipherApp
             leftPanelDecrypt.Controls.Add(lblInput);
             yOffset += 35;
 
-            txtDecryptInput = ControlFactory.CreateModernTextBox(20, yOffset, 440, 150, false);
-            txtDecryptInput.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            txtDecryptInput = ControlFactory.CreateModernTextBox(20, yOffset, panelWidth - 40, 150, false);
             leftPanelDecrypt.Controls.Add(txtDecryptInput);
             yOffset += 175;
 
@@ -269,26 +202,22 @@ namespace XorCipherApp
             leftPanelDecrypt.Controls.Add(lblKey);
             yOffset += 30;
 
-            txtDecryptKey = ControlFactory.CreateModernTextBox(20, yOffset, 440, 40, false);
-            txtDecryptKey.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            txtDecryptKey = ControlFactory.CreateModernTextBox(20, yOffset, panelWidth - 40, 40, false);
             txtDecryptKey.Text = _config.DefaultKey;
             leftPanelDecrypt.Controls.Add(txtDecryptKey);
             yOffset += 65;
 
             // Buttons in left panel
-            btnLoadDecryptFile = ControlFactory.CreateModernButton("📁 Загрузить HEX файл", 20, yOffset, 195, 45);
-            btnLoadDecryptFile.Anchor = AnchorStyles.Top | AnchorStyles.Left;
+            btnLoadDecryptFile = ControlFactory.CreateModernButton("📁 Загрузить HEX файл", 20, yOffset, (panelWidth - 60) / 2 - 5, 45);
             btnLoadDecryptFile.Click += BtnLoadDecryptFile_Click;
             leftPanelDecrypt.Controls.Add(btnLoadDecryptFile);
 
-            btnDecrypt = ControlFactory.CreateModernButton("🔓 Расшифровать", 235, yOffset, 195, 45);
-            btnDecrypt.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            btnDecrypt = ControlFactory.CreateModernButton("🔓 Расшифровать", 20 + (panelWidth - 60) / 2 + 10, yOffset, (panelWidth - 60) / 2 - 5, 45);
             btnDecrypt.Click += BtnDecrypt_Click;
             leftPanelDecrypt.Controls.Add(btnDecrypt);
             yOffset += 60;
 
-            btnClearDecrypt = ControlFactory.CreateModernButton("🗑️ Очистить всё", 20, yOffset, 195, 45);
-            btnClearDecrypt.Anchor = AnchorStyles.Top | AnchorStyles.Left;
+            btnClearDecrypt = ControlFactory.CreateModernButton("🗑️ Очистить всё", 20, yOffset, (panelWidth - 60) / 2 - 5, 45);
             btnClearDecrypt.Click += BtnClearDecrypt_Click;
             leftPanelDecrypt.Controls.Add(btnClearDecrypt);
 
@@ -296,35 +225,13 @@ namespace XorCipherApp
             Label lblResult = ControlFactory.CreateStyledLabel("Результат:", 20, 20, 12F, true);
             rightPanelDecrypt.Controls.Add(lblResult);
 
-            txtDecryptResult = ControlFactory.CreateModernTextBox(20, 55, 440, 430, true);
-            txtDecryptResult.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right | AnchorStyles.Bottom;
+            txtDecryptResult = ControlFactory.CreateModernTextBox(20, 55, panelWidth - 40, 480, true);
             txtDecryptResult.BackColor = ColorPalette.SurfaceWhite;
             rightPanelDecrypt.Controls.Add(txtDecryptResult);
 
-            btnSaveDecryptResult = ControlFactory.CreateModernButton("💾 Сохранить результат", 20, 510, 440, 50);
-            btnSaveDecryptResult.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            btnSaveDecryptResult = ControlFactory.CreateModernButton("💾 Сохранить результат", 20, 555, panelWidth - 40, 50);
             btnSaveDecryptResult.Click += BtnSaveDecryptResult_Click;
             rightPanelDecrypt.Controls.Add(btnSaveDecryptResult);
-        }
-
-        protected override void OnScaleChanged(EventArgs e)
-        {
-            base.OnScaleChanged(e);
-            // Apply scaling to panels and controls based on window size
-            // This enables responsive behavior
-            var scaleFactor = ScaleFactor;
-            
-            // Adjust panel sizes proportionally
-            if (leftPanelEncrypt != null && rightPanelEncrypt != null)
-            {
-                int panelWidth = (int)(480 * scaleFactor);
-                int panelHeight = (int)(580 * scaleFactor);
-                int gap = (int)(20 * scaleFactor);
-                
-                leftPanelEncrypt.Size = new Size(panelWidth, panelHeight);
-                rightPanelEncrypt.Size = new Size(panelWidth, panelHeight);
-                rightPanelEncrypt.Location = new Point((int)((480 + gap) * scaleFactor), (int)(15 * scaleFactor));
-            }
         }
 
         private void BtnEncrypt_Click(object? sender, EventArgs e)
