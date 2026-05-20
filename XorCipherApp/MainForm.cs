@@ -69,7 +69,7 @@ namespace XorCipherApp
         {
             btn.FlatStyle = FlatStyle.Flat;
             btn.FlatAppearance.BorderSize = 0;
-            btn.BackColor = ColorPalette.Primary;
+            btn.BackColor = ColorPalette.PrimaryDark;
             btn.ForeColor = Color.White;
             btn.Font = new Font("Segoe UI", 10F, FontStyle.Regular);
             btn.Cursor = Cursors.Hand;

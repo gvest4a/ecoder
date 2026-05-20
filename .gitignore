@@ -8,30 +8,30 @@
 *.suo
 *.cache
 *.ilk
-*.ipdb
 *.iobj
-*.exp
-*.lib
+*.ipdb
 *.tlog
-*.lastbuildstate
+*.log
 
 # Dependencies
 packages/
 bin/
 obj/
 
-# Logs
-*.log
+# Visual Studio Code
+.vscode/
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
 
 # Environment
 .env
 .env.local
 *.env.*
 
-# Editors
-.vs/
-.vscode/
-*.userprefs
-Thumbs.db
+# OS generated files
 .DS_Store
+Thumbs.db
 ```
