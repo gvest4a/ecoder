@@ -30,56 +30,6 @@ namespace XorCipherApp
             _config = config;
             
             InitializeComponent();
-            ApplyCustomStyles();
-        }
-
-        private void ApplyCustomStyles()
-        {
-            // Apply custom styles from ColorPalette and ControlFactory
-            BackColor = ColorPalette.BgLight;
-            
-            // Style Encrypt Tab panels
-            leftPanelEncrypt.BackColor = ColorPalette.SurfaceWhite;
-            rightPanelEncrypt.BackColor = ColorPalette.SurfaceWhite;
-            
-            // Style Decrypt Tab panels
-            leftPanelDecrypt.BackColor = ColorPalette.SurfaceWhite;
-            rightPanelDecrypt.BackColor = ColorPalette.SurfaceWhite;
-            
-            // Apply button styles
-            StyleButton(btnLoadEncryptFile);
-            StyleButton(btnEncrypt);
-            StyleButton(btnClearEncrypt);
-            StyleButton(btnSaveEncryptResult);
-            StyleButton(btnLoadDecryptFile);
-            StyleButton(btnDecrypt);
-            StyleButton(btnClearDecrypt);
-            StyleButton(btnSaveDecryptResult);
-            
-            // Apply textbox styles
-            StyleTextBox(txtEncryptInput);
-            StyleTextBox(txtEncryptKey);
-            StyleTextBox(txtEncryptResult);
-            StyleTextBox(txtDecryptInput);
-            StyleTextBox(txtDecryptKey);
-            StyleTextBox(txtDecryptResult);
-        }
-
-        private void StyleButton(Button btn)
-        {
-            btn.FlatStyle = FlatStyle.Flat;
-            btn.FlatAppearance.BorderSize = 0;
-            btn.BackColor = ColorPalette.PrimaryDark;
-            btn.ForeColor = Color.White;
-            btn.Font = new Font("Segoe UI", 10F, FontStyle.Regular);
-            btn.Cursor = Cursors.Hand;
-        }
-
-        private void StyleTextBox(TextBox txt)
-        {
-            txt.BorderStyle = BorderStyle.FixedSingle;
-            txt.Font = new Font("Segoe UI", 10F);
-            txt.Padding = new Padding(5);
         }
 
         private void BtnEncrypt_Click(object? sender, EventArgs e)

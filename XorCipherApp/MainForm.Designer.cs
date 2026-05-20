@@ -35,7 +35,7 @@ namespace XorCipherApp
             this.MaximizeBox = false;
             this.Text = "XOR Шифрование текста";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.BackColor = ColorPalette.BgMedium;
+            this.BackColor = XorCipherApp.UI.ColorPalette.BgMedium;
             this.Padding = new System.Windows.Forms.Padding(15);
             this.Font = new System.Drawing.Font("Segoe UI", 10F);
 
@@ -60,14 +60,14 @@ namespace XorCipherApp
             });
 
             // tabEncrypt
-            this.tabEncrypt.BackColor = ColorPalette.BgMedium;
+            this.tabEncrypt.BackColor = XorCipherApp.UI.ColorPalette.BgMedium;
             this.tabEncrypt.AutoScroll = true;
             this.tabEncrypt.Padding = new System.Windows.Forms.Padding(15);
             this.tabEncrypt.Text = "Шифрование";
             this.tabEncrypt.Location = new System.Drawing.Point(4, 44);
 
             // tabDecrypt
-            this.tabDecrypt.BackColor = ColorPalette.BgMedium;
+            this.tabDecrypt.BackColor = XorCipherApp.UI.ColorPalette.BgMedium;
             this.tabDecrypt.AutoScroll = true;
             this.tabDecrypt.Padding = new System.Windows.Forms.Padding(15);
             this.tabDecrypt.Text = "Расшифрование";
@@ -80,7 +80,7 @@ namespace XorCipherApp
             this.leftPanelEncrypt.Size = new System.Drawing.Size(550, 600);
             this.leftPanelEncrypt.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.leftPanelEncrypt.Name = "leftPanelEncrypt";
-            this.leftPanelEncrypt.BackColor = ColorPalette.SurfaceWhite;
+            this.leftPanelEncrypt.BackColor = XorCipherApp.UI.ColorPalette.SurfaceWhite;
 
             // rightPanelEncrypt
             this.rightPanelEncrypt = new System.Windows.Forms.Panel();
@@ -88,7 +88,7 @@ namespace XorCipherApp
             this.rightPanelEncrypt.Size = new System.Drawing.Size(550, 600);
             this.rightPanelEncrypt.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.rightPanelEncrypt.Name = "rightPanelEncrypt";
-            this.rightPanelEncrypt.BackColor = ColorPalette.SurfaceWhite;
+            this.rightPanelEncrypt.BackColor = XorCipherApp.UI.ColorPalette.SurfaceWhite;
 
             // lblInput (Encrypt)
             this.lblEncryptInput = new System.Windows.Forms.Label();
@@ -132,7 +132,7 @@ namespace XorCipherApp
             this.btnLoadEncryptFile.Name = "btnLoadEncryptFile";
             this.btnLoadEncryptFile.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnLoadEncryptFile.FlatAppearance.BorderSize = 0;
-            this.btnLoadEncryptFile.BackColor = ColorPalette.PrimaryDark;
+            this.btnLoadEncryptFile.BackColor = XorCipherApp.UI.ColorPalette.PrimaryDark;
             this.btnLoadEncryptFile.ForeColor = System.Drawing.Color.White;
             this.btnLoadEncryptFile.Font = new System.Drawing.Font("Segoe UI", 10F);
             this.btnLoadEncryptFile.Cursor = System.Windows.Forms.Cursors.Hand;
@@ -146,7 +146,7 @@ namespace XorCipherApp
             this.btnEncrypt.Name = "btnEncrypt";
             this.btnEncrypt.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnEncrypt.FlatAppearance.BorderSize = 0;
-            this.btnEncrypt.BackColor = ColorPalette.PrimaryDark;
+            this.btnEncrypt.BackColor = XorCipherApp.UI.ColorPalette.PrimaryDark;
             this.btnEncrypt.ForeColor = System.Drawing.Color.White;
             this.btnEncrypt.Font = new System.Drawing.Font("Segoe UI", 10F);
             this.btnEncrypt.Cursor = System.Windows.Forms.Cursors.Hand;
@@ -160,7 +160,7 @@ namespace XorCipherApp
             this.btnClearEncrypt.Name = "btnClearEncrypt";
             this.btnClearEncrypt.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnClearEncrypt.FlatAppearance.BorderSize = 0;
-            this.btnClearEncrypt.BackColor = ColorPalette.PrimaryDark;
+            this.btnClearEncrypt.BackColor = XorCipherApp.UI.ColorPalette.PrimaryDark;
             this.btnClearEncrypt.ForeColor = System.Drawing.Color.White;
             this.btnClearEncrypt.Font = new System.Drawing.Font("Segoe UI", 10F);
             this.btnClearEncrypt.Cursor = System.Windows.Forms.Cursors.Hand;
@@ -194,7 +194,7 @@ namespace XorCipherApp
             this.btnSaveEncryptResult.Name = "btnSaveEncryptResult";
             this.btnSaveEncryptResult.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnSaveEncryptResult.FlatAppearance.BorderSize = 0;
-            this.btnSaveEncryptResult.BackColor = ColorPalette.PrimaryDark;
+            this.btnSaveEncryptResult.BackColor = XorCipherApp.UI.ColorPalette.PrimaryDark;
             this.btnSaveEncryptResult.ForeColor = System.Drawing.Color.White;
             this.btnSaveEncryptResult.Font = new System.Drawing.Font("Segoe UI", 10F);
             this.btnSaveEncryptResult.Cursor = System.Windows.Forms.Cursors.Hand;
@@ -207,7 +207,7 @@ namespace XorCipherApp
             this.leftPanelDecrypt.Size = new System.Drawing.Size(550, 600);
             this.leftPanelDecrypt.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.leftPanelDecrypt.Name = "leftPanelDecrypt";
-            this.leftPanelDecrypt.BackColor = ColorPalette.SurfaceWhite;
+            this.leftPanelDecrypt.BackColor = XorCipherApp.UI.ColorPalette.SurfaceWhite;
 
             // rightPanelDecrypt
             this.rightPanelDecrypt = new System.Windows.Forms.Panel();
@@ -215,7 +215,7 @@ namespace XorCipherApp
             this.rightPanelDecrypt.Size = new System.Drawing.Size(550, 600);
             this.rightPanelDecrypt.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.rightPanelDecrypt.Name = "rightPanelDecrypt";
-            this.rightPanelDecrypt.BackColor = ColorPalette.SurfaceWhite;
+            this.rightPanelDecrypt.BackColor = XorCipherApp.UI.ColorPalette.SurfaceWhite;
 
             // lblDecryptInput
             this.lblDecryptInput = new System.Windows.Forms.Label();
@@ -257,7 +257,7 @@ namespace XorCipherApp
             this.btnLoadDecryptFile.Name = "btnLoadDecryptFile";
             this.btnLoadDecryptFile.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnLoadDecryptFile.FlatAppearance.BorderSize = 0;
-            this.btnLoadDecryptFile.BackColor = ColorPalette.PrimaryDark;
+            this.btnLoadDecryptFile.BackColor = XorCipherApp.UI.ColorPalette.PrimaryDark;
             this.btnLoadDecryptFile.ForeColor = System.Drawing.Color.White;
             this.btnLoadDecryptFile.Font = new System.Drawing.Font("Segoe UI", 10F);
             this.btnLoadDecryptFile.Cursor = System.Windows.Forms.Cursors.Hand;
@@ -271,7 +271,7 @@ namespace XorCipherApp
             this.btnDecrypt.Name = "btnDecrypt";
             this.btnDecrypt.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnDecrypt.FlatAppearance.BorderSize = 0;
-            this.btnDecrypt.BackColor = ColorPalette.PrimaryDark;
+            this.btnDecrypt.BackColor = XorCipherApp.UI.ColorPalette.PrimaryDark;
             this.btnDecrypt.ForeColor = System.Drawing.Color.White;
             this.btnDecrypt.Font = new System.Drawing.Font("Segoe UI", 10F);
             this.btnDecrypt.Cursor = System.Windows.Forms.Cursors.Hand;
@@ -285,7 +285,7 @@ namespace XorCipherApp
             this.btnClearDecrypt.Name = "btnClearDecrypt";
             this.btnClearDecrypt.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnClearDecrypt.FlatAppearance.BorderSize = 0;
-            this.btnClearDecrypt.BackColor = ColorPalette.PrimaryDark;
+            this.btnClearDecrypt.BackColor = XorCipherApp.UI.ColorPalette.PrimaryDark;
             this.btnClearDecrypt.ForeColor = System.Drawing.Color.White;
             this.btnClearDecrypt.Font = new System.Drawing.Font("Segoe UI", 10F);
             this.btnClearDecrypt.Cursor = System.Windows.Forms.Cursors.Hand;
@@ -317,7 +317,7 @@ namespace XorCipherApp
             this.btnSaveDecryptResult.Name = "btnSaveDecryptResult";
             this.btnSaveDecryptResult.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnSaveDecryptResult.FlatAppearance.BorderSize = 0;
-            this.btnSaveDecryptResult.BackColor = ColorPalette.PrimaryDark;
+            this.btnSaveDecryptResult.BackColor = XorCipherApp.UI.ColorPalette.PrimaryDark;
             this.btnSaveDecryptResult.ForeColor = System.Drawing.Color.White;
             this.btnSaveDecryptResult.Font = new System.Drawing.Font("Segoe UI", 10F);
             this.btnSaveDecryptResult.Cursor = System.Windows.Forms.Cursors.Hand;
