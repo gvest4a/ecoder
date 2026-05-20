@@ -1,34 +1,24 @@
-```csharp
-# Build results
-[Dd]ebug/
-[Dd]ebugPublic/
-[Rr]elease/
-[Rr]eleases/
-x64/
-x86/
-build/
-bld/
-[Bb]in/
-[Oo]bj/
-
-# Visual Studio files
-.vs/
-*.user
-*.userosscache
-*.suo
-*.csproj.user
-*.vbproj.user
-*.fsproj.user
-*.userprefs
-
-# Visual Studio Code files
-.vscode/
-
-# Compiled binaries
+```
+# Build artifacts
+*.obj
 *.exe
 *.dll
-*.so
-*.dylib
+*.pdb
+*.user
+*.suo
+*.cache
+*.ilk
+*.ipdb
+*.iobj
+*.exp
+*.lib
+*.tlog
+*.lastbuildstate
+
+# Dependencies
+packages/
+bin/
+obj/
 
 # Logs
 *.log
@@ -38,30 +28,10 @@ bld/
 .env.local
 *.env.*
 
-# OS generated files
-.DS_Store
+# Editors
+.vs/
+.vscode/
+*.userprefs
 Thumbs.db
-desktop.ini
-
-# Packages
-*.tar.gz
-*.zip
-*.7z
-*.rar
-
-# IDE
-.idea/
-*.swp
-*.swo
-*.tmp
-
-# Dependencies
-node_modules/
-venv/
-.venv/
-__pycache__/
-.mypy_cache/
-.pytest_cache/
-target/
-.gradle/
+.DS_Store
 ```
